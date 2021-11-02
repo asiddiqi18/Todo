@@ -19,7 +19,7 @@ namespace Todo.subcommands
             string message = Args[1];
             Task newTask = new Task(1, message, DateTime.Now);
 
-            Dictionary<int, Task> tasks = parser.JSONToDict();
+            SortedDictionary<int, Task> tasks = parser.JSONToDict();
 
             parser.NextID += 1;
             newTask.ID = parser.NextID;

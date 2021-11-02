@@ -13,7 +13,7 @@ namespace Todo.subcommands
         }
         public override bool Execute()
         {
-            Dictionary<int, Task> tasks = parser.JSONToDict();
+            SortedDictionary<int, Task> tasks = parser.JSONToDict();
 
             if (tasks.Count == 0)
             {
