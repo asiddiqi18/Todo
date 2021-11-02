@@ -38,6 +38,7 @@ namespace Todo
             commands.Add("remove", new subcommands.Remove(args));
             commands.Add("purge", new subcommands.Purge(args));
             commands.Add("search", new subcommands.Search(args));
+            commands.Add("edit", new subcommands.Edit(args));
 
 
             if (args.Length == 0 || args[0] == "help")

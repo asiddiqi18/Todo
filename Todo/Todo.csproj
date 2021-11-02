@@ -75,6 +75,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="subcommands\Add.cs" />
+    <Compile Include="subcommands\Edit.cs" />
     <Compile Include="subcommands\Purge.cs" />
     <Compile Include="subcommands\Remove.cs" />
     <Compile Include="subcommands\Search.cs" />
