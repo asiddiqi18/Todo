@@ -13,11 +13,11 @@ namespace Todo
         public string FileName { get; set; }
         public int NextID { get; set; }
 
-
+        public SortedDictionary<int, Task> TaskDict;
 
         public void DetermineNextHighestID()
         {
-            SortedDictionary<int, Task> tasks = JSONToDict();
+            SortedDictionary<int, Task> tasks = GetTaskDict();
             List<int> keyList = new List<int>(tasks.Keys);
             if (keyList.Count == 0)
             {
@@ -35,18 +35,27 @@ namespace Todo
             DetermineNextHighestID();
         }
 
-        public SortedDictionary<int, Task> JSONToDict()
+        public SortedDictionary<int, Task> GetTaskDict()
+        {
+            if (TaskDict == null)
+            {
+                JSONToDict();
+            }
+            return TaskDict;
+        }
+
+        private void JSONToDict()
         {
             try
             {
                 string readJSON = File.ReadAllText(FileName);
-                return JsonSerializer.Deserialize<SortedDictionary<int, Task>>(readJSON);
+                TaskDict = JsonSerializer.Deserialize<SortedDictionary<int, Task>>(readJSON);
             }
             catch (Exception e)
             {
                 if (e is FileNotFoundException || e is JsonException)
                 {
-                    return new SortedDictionary<int, Task>();
+                    TaskDict = new SortedDictionary<int, Task>();
                 }
                 else
                 {
@@ -60,12 +69,13 @@ namespace Todo
             var options = new JsonSerializerOptions { WriteIndented = true };
             string writeJSON = JsonSerializer.Serialize(dict, options);
             File.WriteAllText(FileName, writeJSON);
+            TaskDict = dict;
             return true;
         }
 
         public SortedDictionary<int, Task> FilterJSON(string query)
         {
-            SortedDictionary<int, Task> tasks = JSONToDict();
+            SortedDictionary<int, Task> tasks = GetTaskDict();
             SortedDictionary<int, Task> matches = new SortedDictionary<int, Task>();
 
             if (tasks.Count == 0)
@@ -88,6 +98,24 @@ namespace Todo
         {
             File.WriteAllText(FileName, string.Empty);
             return true;
+        }
+
+        public Task GetTaskByID(int ID)
+        {
+            SortedDictionary<int, Task> tasks = GetTaskDict();
+
+            if (ID < 1)
+            {
+                throw new ArgumentException("Task ID's must be at least 1");
+            }
+
+            if (!tasks.ContainsKey(ID))
+            {
+                throw new ArgumentException($"ID {ID} is not found");
+            }
+
+            return tasks[ID];
+
         }
 
     }

@@ -36,9 +36,10 @@ namespace Todo.subcommands
 
         private bool RemoveByID(int[] IDs)
         {
-            SortedDictionary<int, Task> tasks = parser.JSONToDict();
+            SortedDictionary<int, Task> tasks = parser.GetTaskDict();
 
-            foreach (int ID in IDs) {
+            foreach (int ID in IDs)
+            {
                 if (ID < 1)
                 {
                     Console.WriteLine("Task ID's must be at least 1");
@@ -51,9 +52,21 @@ namespace Todo.subcommands
                     return false;
                 }
 
+                Task task;
+
+                try
+                {
+                    task = parser.GetTaskByID(ID);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    return false;
+                }
+
                 parser.NextID -= 1;
 
-                Console.WriteLine($"Successfully deleted task #{ID} ({tasks[ID].Description})");
+                Console.WriteLine($"Successfully deleted task #{ID} ({task.Description})");
                 tasks.Remove(ID);
             }
 
@@ -75,7 +88,7 @@ namespace Todo.subcommands
 
         private static void InSequence(ref SortedDictionary<int, Task> tasks)
         {
-            List<int> keyList = new List<int>(tasks.Keys); // [1 2 5 6 7 9] -> [1 2 3 4 5 6]
+            List<int> keyList = new List<int>(tasks.Keys);
             int nextExpected = 1;
             foreach (var i in keyList)
             {
