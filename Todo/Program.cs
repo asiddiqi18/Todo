@@ -43,9 +43,13 @@ namespace Todo
 
             if (args.Length == 0 || args[0] == "help")
             {
+                Console.WriteLine("{0, -10} {1, -35} {2, -35}", "Command", "Syntax", "Description");
+                Console.WriteLine("{0, -10} {1, -35} {2, -35}", new string('-', 10), new string('-', 35), new string('-', 35));
+
+
                 foreach (var cmd in commands)
                 {
-                    Console.WriteLine($"{cmd.Key}: {cmd.Value.GetSyntax()} -- {cmd.Value.GetHelp()}");
+                    Console.WriteLine("{0, -10} {1, -35} {2, -35}", cmd.Key, cmd.Value.GetSyntax(), cmd.Value.GetHelp());
                 }
                 Environment.Exit(0);
             }
