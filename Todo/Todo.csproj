@@ -77,6 +77,7 @@
     <Compile Include="subcommands\Add.cs" />
     <Compile Include="subcommands\Purge.cs" />
     <Compile Include="subcommands\Remove.cs" />
+    <Compile Include="subcommands\Search.cs" />
     <Compile Include="subcommands\Show.cs" />
     <Compile Include="Task.cs" />
     <Compile Include="TodoCommand.cs" />

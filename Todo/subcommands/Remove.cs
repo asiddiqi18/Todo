@@ -1,56 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Todo.subcommands
 {
-    class Remove : TodoCommand
+    internal class Remove : TodoCommand
     {
         public Remove(string[] args) : base(args)
         {
         }
+
         public override bool Execute()
         {
-            int ID;
             try
             {
-                ID = int.Parse(Args[1]);
-            } catch (FormatException)
-            {
-                Console.WriteLine($"Unable to parse {Args[1]} as a number");
-                return false;
+                int[] ID = { int.Parse(Args[1]) };
+                return RemoveByID(ID);
             }
-
-            if (ID < 1)
+            catch (FormatException)
             {
-                Console.WriteLine("Task ID's must be at least 1");
-                return false;
+                string query = Args[1];
+                return RemoveByQuery(query);
             }
-
-            Dictionary<int, Task> tasks = parser.JSONToDict();
-            if (!tasks.ContainsKey(ID))
-            {
-                Console.WriteLine($"ID {ID} is not found");
-                return false;
-            }
-
-            for (int i = ID; i < parser.NextID; i++)
-            {
-                tasks[i + 1].ID = i;
-                tasks[i] = tasks[i + 1];
-            }
-
-            tasks.Remove(parser.NextID);
-
-            parser.NextID -= 1;
-
-            parser.WriteJSON(tasks);
-
-            Console.WriteLine($"Successfully deleted task #{ID}");
-
-            return true;
         }
 
         public override string GetHelp()
@@ -62,5 +33,61 @@ namespace Todo.subcommands
         {
             return "todo remove <id>";
         }
+
+        private bool RemoveByID(int[] IDs)
+        {
+            SortedDictionary<int, Task> tasks = parser.JSONToDict();
+
+            foreach (int ID in IDs) {
+                if (ID < 1)
+                {
+                    Console.WriteLine("Task ID's must be at least 1");
+                    return false;
+                }
+
+                if (!tasks.ContainsKey(ID))
+                {
+                    Console.WriteLine($"ID {ID} is not found");
+                    return false;
+                }
+
+                parser.NextID -= 1;
+
+                Console.WriteLine($"Successfully deleted task #{ID} ({tasks[ID].Description})");
+                tasks.Remove(ID);
+            }
+
+            InSequence(ref tasks);
+
+            parser.WriteJSON(tasks);
+
+            return true;
+        }
+
+        private bool RemoveByQuery(string query)
+        {
+            int[] tasks = parser.FilterJSON(query).Keys.ToArray();
+
+            RemoveByID(tasks);
+
+            return true;
+        }
+
+        private static void InSequence(ref SortedDictionary<int, Task> tasks)
+        {
+            List<int> keyList = new List<int>(tasks.Keys); // [1 2 5 6 7 9] -> [1 2 3 4 5 6]
+            int nextExpected = 1;
+            foreach (var i in keyList)
+            {
+                if (i != nextExpected)
+                {
+                    tasks[nextExpected] = tasks[i];
+                    tasks.Remove(i);
+                }
+                nextExpected += 1;
+            }
+
+        }
+
     }
 }

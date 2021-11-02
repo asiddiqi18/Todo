@@ -17,7 +17,7 @@ namespace Todo
 
         public void DetermineNextHighestID()
         {
-            Dictionary<int, Task> tasks = JSONToDict();
+            SortedDictionary<int, Task> tasks = JSONToDict();
             List<int> keyList = new List<int>(tasks.Keys);
             if (keyList.Count == 0)
             {
@@ -35,31 +35,53 @@ namespace Todo
             DetermineNextHighestID();
         }
 
-        public Dictionary<int, Task> JSONToDict()
+        public SortedDictionary<int, Task> JSONToDict()
         {
             try
             {
                 string readJSON = File.ReadAllText(FileName);
-                return JsonSerializer.Deserialize<Dictionary<int, Task>>(readJSON);
+                return JsonSerializer.Deserialize<SortedDictionary<int, Task>>(readJSON);
             }
             catch (Exception e)
             {
                 if (e is FileNotFoundException || e is JsonException)
                 {
-                    return new Dictionary<int, Task>();
-                } else
+                    return new SortedDictionary<int, Task>();
+                }
+                else
                 {
                     throw;
                 }
             }
         }
 
-        public bool WriteJSON(Dictionary<int, Task> dict)
+        public bool WriteJSON(SortedDictionary<int, Task> dict)
         {
             var options = new JsonSerializerOptions { WriteIndented = true };
             string writeJSON = JsonSerializer.Serialize(dict, options);
             File.WriteAllText(FileName, writeJSON);
             return true;
+        }
+
+        public SortedDictionary<int, Task> FilterJSON(string query)
+        {
+            SortedDictionary<int, Task> tasks = JSONToDict();
+            SortedDictionary<int, Task> matches = new SortedDictionary<int, Task>();
+
+            if (tasks.Count == 0)
+            {
+                return matches;
+            }
+
+            foreach (var task in tasks)
+            {
+                if (task.Value.Description.Contains(query))
+                {
+                    matches[task.Key] = task.Value;
+                }
+            }
+
+            return matches;
         }
 
         public bool ClearJSON()
