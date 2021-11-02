@@ -12,26 +12,6 @@ namespace Todo
         static void Main(string[] args)
         {
 
-
-            //Task taskA = new Task(1, "My first task", DateTime.Now);
-            //Task taskB = new Task(2, "My second task", DateTime.Now.AddDays(30));
-            //Task[] taskList = { taskA, taskB };
-
-            ////Console.WriteLine(taskA.ToString());
-
-            //string jsonString = JsonSerializer.Serialize(taskList);
-            //Console.WriteLine(jsonString);
-
-            //List<Task> taskListReturn = JsonSerializer.Deserialize<List<Task>>(jsonString);
-            //Task taskC = new Task(3, "My third task", DateTime.Now.AddMinutes(45));
-            //taskListReturn.Add(taskC);
-
-            //foreach (Task t in taskListReturn)
-            //{
-            //    Console.WriteLine(t);
-            //}
-
-
             Dictionary<string, TodoCommand> commands = new Dictionary<string, TodoCommand>();
             commands.Add("add", new subcommands.Add(args));
             commands.Add("show", new subcommands.Show(args));
@@ -39,18 +19,13 @@ namespace Todo
             commands.Add("purge", new subcommands.Purge(args));
             commands.Add("search", new subcommands.Search(args));
             commands.Add("edit", new subcommands.Edit(args));
+            commands.Add("help", new subcommands.Help(args, commands));
 
 
-            if (args.Length == 0 || args[0] == "help")
+
+            if (args.Length == 0)
             {
-                Console.WriteLine("{0, -10} {1, -35} {2, -35}", "Command", "Syntax", "Description");
-                Console.WriteLine("{0, -10} {1, -35} {2, -35}", new string('-', 10), new string('-', 35), new string('-', 35));
-
-
-                foreach (var cmd in commands)
-                {
-                    Console.WriteLine("{0, -10} {1, -35} {2, -35}", cmd.Key, cmd.Value.GetSyntax(), cmd.Value.GetHelp());
-                }
+                commands["help"].Execute();
                 Environment.Exit(0);
             }
 
@@ -58,12 +33,11 @@ namespace Todo
             {
                 Console.WriteLine("Invalid command");
                 // show help
+                commands["help"].Execute();
                 Environment.Exit(-1);
             }
 
             TodoCommand command = commands[args[0]];
-            //Console.WriteLine(command.GetSyntax());
-            //Console.WriteLine(command.GetHelp());
 
             bool commandResult = command.Execute();
 
